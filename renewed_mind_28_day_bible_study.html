@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renew: 28-Day Bible Study</title>
+    <script src="https://cdn.tailwindcss.com/3.4.5"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        slate: { 850: '#151F32', 950: '#0B111E' }
+                    },
+                    fontFamily: {
+                        serif: ['Cinzel', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        };
+        // Apply saved theme before paint
+        (function () {
+            let theme = null;
+            try { theme = localStorage.getItem('renew28-theme'); } catch (e) {}
+            if (theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                document.documentElement.classList.add('dark');
+            }
+        })();
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.05); }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.35); border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(212,175,55,0.6); }
+        input[type="checkbox"] { accent-color: #f59e0b; }
+        @media print {
+            .no-print { display: none !important; }
+            #cards-view { display: none !important; }
+            #tracker-view { display: block !important; }
+            body { background: white !important; color: black !important; }
+            .print-plain { background: white !important; border-color: #ddd !important; box-shadow: none !important; }
+            tr { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 font-sans min-h-screen transition-colors duration-300 antialiased flex flex-col">
+
+    <!-- HEADER -->
+    <header class="border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-30 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between gap-3">
+            <div class="flex items-center space-x-3 min-w-0">
+                <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-950 font-serif font-bold text-xl shadow-md">28</div>
+                <div class="min-w-0">
+                    <h1 class="font-serif font-bold text-sm sm:text-xl text-slate-900 dark:text-amber-100 tracking-wide leading-snug truncate">
+                        Renewed Mind, True Identity &amp; Healthy Relationships
+                    </h1>
+                    <p class="text-xs text-amber-600 dark:text-amber-400 font-medium truncate">28-Day Bible Study • ESV, NIV &amp; TPT Side-by-Side</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
+                <button onclick="resetProgress()" class="text-xs text-slate-500 hover:text-red-500 dark:text-slate-400 dark:hover:text-red-400 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-800 transition" title="Reset all progress">
+                    <i class="fa-solid fa-rotate-left sm:mr-1"></i><span class="hidden sm:inline"> Reset</span>
+                </button>
+                <button onclick="window.print()" class="px-3 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-xs font-semibold transition flex items-center space-x-1.5" title="Print tracker">
+                    <i class="fa-solid fa-print"></i><span class="hidden sm:inline">Print Tracker</span>
+                </button>
+                <button onclick="toggleTheme()" class="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-amber-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition" title="Toggle theme">
+                    <i id="theme-icon" class="fa-solid fa-moon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- HERO / PROGRESS -->
+    <section class="bg-gradient-to-b from-slate-100 to-slate-50 dark:from-slate-900 dark:to-slate-950 border-b border-slate-200 dark:border-slate-800 py-8 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto">
+            <div class="space-y-2 max-w-3xl">
+                <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">28-Day Guided Bible Study</span>
+                <h2 class="text-2xl sm:text-3xl font-serif font-bold text-slate-900 dark:text-slate-50">Transform Your Mind. Reclaim Your Purpose.</h2>
+                <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Four weeks to break negative patterns, shift your mindset, ground your worth in God’s design and build life-giving relationships.
+                    Read each day’s passage in the ESV, NIV and TPT, and read alongside <em>Battlefield of the Mind</em> and <em>The Power of the Mind</em>.
+                </p>
+            </div>
+
+            <!-- Progress cards -->
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="print-plain bg-white dark:bg-slate-850 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Days completed</span>
+                        <span id="stat-days" class="text-sm font-bold text-amber-600 dark:text-amber-400">0 / 28</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden"><div id="bar-days" class="bg-gradient-to-r from-amber-500 to-amber-400 h-full w-0 transition-all duration-500"></div></div>
+                    <p id="next-up" class="mt-2 text-xs text-amber-600 dark:text-amber-400 font-medium"><i class="fa-solid fa-fire mr-1"></i>Start with Day 1</p>
+                </div>
+                <div class="print-plain bg-white dark:bg-slate-850 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Bible (all 3 versions)</span>
+                        <span id="stat-bible" class="text-sm font-bold text-amber-600 dark:text-amber-400">0 / 28</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden"><div id="bar-bible" class="bg-gradient-to-r from-amber-500 to-amber-400 h-full w-0 transition-all duration-500"></div></div>
+                    <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">ESV • NIV • TPT each day</p>
+                </div>
+                <div class="print-plain bg-white dark:bg-slate-850 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Battlefield of the Mind</span>
+                        <span id="stat-bom" class="text-sm font-bold text-amber-600 dark:text-amber-400">0 / 25</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden"><div id="bar-bom" class="bg-gradient-to-r from-amber-500 to-amber-400 h-full w-0 transition-all duration-500"></div></div>
+                    <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">1 chapter a day • Days 1–25</p>
+                </div>
+                <div class="print-plain bg-white dark:bg-slate-850 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">The Power of the Mind</span>
+                        <span id="stat-pom" class="text-sm font-bold text-amber-600 dark:text-amber-400">0 / 13</span>
+                    </div>
+                    <div class="w-full bg-slate-200 dark:bg-slate-700 h-2.5 rounded-full overflow-hidden"><div id="bar-pom" class="bg-gradient-to-r from-amber-500 to-amber-400 h-full w-0 transition-all duration-500"></div></div>
+                    <p class="mt-2 text-xs text-slate-500 dark:text-slate-400">1 chapter every 2nd day • Days 2–26</p>
+                </div>
+            </div>
+
+            <!-- View toggle + week filter -->
+            <div class="mt-8 flex flex-col md:flex-row md:items-end md:justify-between gap-3 no-print">
+                <div id="week-tabs" class="flex items-center gap-1 border-b border-slate-200 dark:border-slate-800 overflow-x-auto custom-scrollbar pb-1"></div>
+                <div class="inline-flex self-start md:self-auto rounded-lg border border-slate-200 dark:border-slate-800 p-0.5 bg-white dark:bg-slate-900">
+                    <button id="view-cards" onclick="setView('cards')" class="view-btn px-3 py-1.5 text-xs font-semibold rounded-md transition"><i class="fa-solid fa-grip mr-1"></i>Daily cards</button>
+                    <button id="view-tracker" onclick="setView('tracker')" class="view-btn px-3 py-1.5 text-xs font-semibold rounded-md transition"><i class="fa-solid fa-table-list mr-1"></i>Reading tracker</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- MAIN -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="cards-view" class="space-y-10"></div>
+
+        <div id="tracker-view" class="hidden">
+            <div class="print-plain rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-x-auto custom-scrollbar">
+                <table class="w-full text-sm min-w-[720px]">
+                    <thead>
+                        <tr class="text-left text-xs uppercase tracking-wider text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-800">
+                            <th class="px-4 py-3 w-12">Day</th>
+                            <th class="px-4 py-3">Scripture</th>
+                            <th class="px-4 py-3">Translations</th>
+                            <th class="px-4 py-3">Battlefield</th>
+                            <th class="px-4 py-3">Power of Mind</th>
+                            <th class="px-4 py-3 w-14 text-center">Done</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tracker-body"></tbody>
+                </table>
+            </div>
+            <p class="mt-4 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                <strong class="text-slate-700 dark:text-slate-300">Book pace:</strong> <em>Battlefield of the Mind</em>, 1 chapter a day (Days 1–25).
+                <em>The Power of the Mind</em>, 1 chapter every second day (Days 2–26). Days 26–28 are for catching up, so you finish both books before the plan ends.
+            </p>
+        </div>
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800 py-6 px-4 bg-white dark:bg-slate-900 text-center text-xs text-slate-500 dark:text-slate-400 no-print space-y-1">
+        <p>28-Day Mind Renewal &amp; Growth Roadmap • Your progress and journal notes are saved in this browser only.</p>
+        <p>Passages open on Bible Gateway with ESV, NIV and TPT side by side. TPT covers the New Testament, Psalms, Proverbs and only some Old Testament books, so a few Old Testament days may show ESV and NIV only.</p>
+    </footer>
+
+    <!-- DAY MODAL -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4" onclick="if (event.target === this) closeModal()">
+        <div class="bg-white dark:bg-slate-900 w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden flex flex-col max-h-[92vh]">
+            <div class="p-5 sm:p-6 border-b border-slate-200 dark:border-slate-800 flex items-start justify-between bg-slate-50/50 dark:bg-slate-850/50">
+                <div class="space-y-1 pr-4">
+                    <div class="flex items-center flex-wrap gap-2">
+                        <span id="modal-day-badge" class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">Day 1</span>
+                        <span id="modal-week-badge" class="text-xs text-slate-500 font-medium">Week 1</span>
+                    </div>
+                    <h3 id="modal-title" class="text-lg sm:text-xl font-serif font-bold text-slate-900 dark:text-slate-50">Title</h3>
+                </div>
+                <div class="flex items-center">
+                    <button onclick="stepDay(-1)" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded-lg transition" title="Previous day"><i class="fa-solid fa-chevron-left"></i></button>
+                    <button onclick="stepDay(1)" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded-lg transition" title="Next day"><i class="fa-solid fa-chevron-right"></i></button>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 p-2 rounded-lg transition" title="Close"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+            </div>
+
+            <div class="p-5 sm:p-6 overflow-y-auto space-y-6 custom-scrollbar flex-grow">
+                <!-- Scripture -->
+                <div class="p-4 rounded-xl bg-amber-500/5 border border-amber-500/20 space-y-3">
+                    <span class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 flex items-center">
+                        <i class="fa-solid fa-book-bible mr-1.5"></i> Key Scripture (ESV • NIV • TPT)
+                    </span>
+                    <p id="modal-scripture" class="font-serif font-bold text-slate-900 dark:text-amber-100"></p>
+                    <a id="modal-parallel" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs font-bold transition">
+                        <i class="fa-solid fa-columns"></i> Open all three side by side
+                    </a>
+                    <div id="modal-translations" class="grid grid-cols-1 sm:grid-cols-3 gap-2"></div>
+                </div>
+
+                <!-- Book reading -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400"><i class="fa-solid fa-book-open mr-1.5"></i>Book Reading</h4>
+                    <div id="modal-books" class="grid grid-cols-1 sm:grid-cols-2 gap-2"></div>
+                </div>
+
+                <!-- Focus -->
+                <div class="space-y-2">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Core Focus</h4>
+                    <p id="modal-focus" class="text-sm text-slate-700 dark:text-slate-300 leading-relaxed"></p>
+                </div>
+
+                <!-- Character -->
+                <div class="p-4 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-2">
+                    <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider flex items-center">
+                        <i class="fa-solid fa-user-graduate mr-1.5"></i> Character Spotlight
+                    </span>
+                    <h5 id="modal-character-name" class="font-serif font-bold text-slate-900 dark:text-slate-100 text-sm"></h5>
+                    <p id="modal-character-desc" class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed"></p>
+                </div>
+
+                <!-- Reflection -->
+                <div class="space-y-2 border-t border-slate-200 dark:border-slate-800 pt-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Daily Reflection Prompt</h4>
+                    <p id="modal-reflection" class="text-sm font-medium text-slate-800 dark:text-slate-200 italic bg-slate-50 dark:bg-slate-800/40 p-3 rounded-lg border-l-4 border-amber-500"></p>
+                </div>
+
+                <!-- Journal -->
+                <div class="space-y-2">
+                    <label for="modal-journal-input" class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                        <span><i class="fa-solid fa-pen-to-square mr-1.5"></i> Personal Reflection Journal</span>
+                        <span id="journal-saved-status" class="text-[10px] text-emerald-500 hidden font-normal normal-case tracking-normal">Saved</span>
+                    </label>
+                    <textarea id="modal-journal-input" rows="4" placeholder="Write your thoughts, prayers, or insights here..." class="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-y"></textarea>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-850/50 flex items-center justify-between gap-3">
+                <label class="flex items-center space-x-2.5 cursor-pointer">
+                    <input type="checkbox" id="modal-done" class="w-5 h-5 cursor-pointer">
+                    <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">Mark day as completed</span>
+                </label>
+                <button onclick="saveJournalNote()" class="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-xs transition shadow-md">Save Notes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const WEEKS = {
+            1: 'Renewing Your Mind',
+            2: 'Shifting Your Mindset',
+            3: 'Rediscovering Who You Are',
+            4: 'Building Relationships'
+        };
+        const VERSIONS = ['ESV', 'NIV', 'TPT'];
+        const BOOKS = {
+            bom: { title: 'Battlefield of the Mind', total: 25 },
+            pom: { title: 'The Power of the Mind', total: 13 }
+        };
+
+        // [title, scripture (display), search query, focus, reflection, character, character description]
+        const RAW = [
+            // WEEK 1 — Renewing Your Mind
+            ["Offered and Transformed", "Romans 12:1–2", "Romans 12:1-2",
+             "Transformation starts with surrender. Paul urges us to offer our whole selves to God and to stop letting the world press us into its mould. Real change comes as God renews the way we think, which then reshapes how we live and helps us discern His good will.",
+             "Which pattern of this world has been shaping my thinking most, and what would surrendering it look like today?",
+             "Daniel", "Taken to Babylon as a young man and given a new name, language and diet, Daniel “resolved” in his heart not to defile himself (Daniel 1:8). His mind was settled before the pressure came, and God honoured that decision with wisdom and favour."],
+            ["When Your Mind Is Worn Out", "1 Kings 19", "1 Kings 19",
+             "Right after a great victory, Elijah ran, isolated himself and asked to die. God did not lecture him. He gave him sleep, food, His presence in a gentle whisper, and then a fresh assignment and a companion. Renewing the mind often begins with caring for the body and listening again.",
+             "Where am I running on empty, and what “bread and rest” is God offering me before the next step?",
+             "Elijah", "A bold prophet who called down fire on Mount Carmel, then fled in fear from Jezebel’s threat. His story shows how exhaustion distorts our thinking (“I, even I only, am left”) and how patiently God restores us, even sending Elisha to walk with him."],
+            ["Guarding Your Thought Life", "Philippians 4:4–9", "Philippians 4:4-9",
+             "Paul gives a practical pattern: rejoice, be gentle, pray about everything with thanksgiving, and deliberately think about what is true, honourable, just, pure, lovely and commendable. God’s peace then stands guard over heart and mind.",
+             "Take one anxious thought from today: is it true? What would I think about instead if I filtered it through verse 8?",
+             "Jehoshaphat", "Facing a vast army, King Jehoshaphat prayed, “We do not know what to do, but our eyes are on you” (2 Chronicles 20:12). He sent singers ahead of the army. Praise came before the victory, a living picture of prayer with thanksgiving."],
+            ["Taking Thoughts Captive", "2 Corinthians 10:3–5", "2 Corinthians 10:3-5",
+             "The battle for our lives is fought largely in the mind. Arguments and proud ideas that set themselves against the knowledge of God are strongholds. We don’t ignore them; we take each thought captive and bring it into line with Christ.",
+             "What recurring lie have I accepted as normal, and which truth from Scripture directly answers it?",
+             "Jesus in the Wilderness", "Hungry and alone for forty days, Jesus faced three temptations that twisted God’s words (Matthew 4:1–11). Each time He answered, “It is written,” showing us how to meet a lying thought with a specific truth."],
+            ["Perfect Peace and an Honest Heart", "Isaiah 26:3–4 · Psalm 139:23–24", "Isaiah 26:3-4; Psalm 139:23-24",
+             "Peace is promised to the mind that stays on God because it trusts Him. Alongside that trust, David invites God to search him and expose anxious and hurtful ways. Renewal includes letting God show us what is really going on inside.",
+             "Pray Psalm 139:23–24 slowly. What anxious thought or hurtful way does God bring to the surface?",
+             "Hezekiah", "When the Assyrian king sent a threatening letter, Hezekiah took it to the temple and spread it out before the Lord (Isaiah 37:14). Instead of letting fear run his mind, he put the problem in front of God, and Jerusalem was delivered."],
+            ["Put Off, Be Renewed, Put On", "Ephesians 4:17–24", "Ephesians 4:17-24",
+             "Paul describes the futile, darkened thinking of a life without God, then gives a three-step rhythm: put off the old self, be renewed in the spirit of your mind, and put on the new self created to be like God in righteousness and holiness.",
+             "What specific old habit do I need to put off, and what new habit will I put on in its place?",
+             "Zacchaeus", "A wealthy, despised tax collector who climbed a tree to see Jesus (Luke 19:1–10). One meal with Jesus changed how he thought about money and people. He gave half his goods to the poor and repaid those he had cheated four times over."],
+            ["Set Your Mind on Things Above", "Colossians 3:1–17", "Colossians 3:1-17",
+             "Because we have been raised with Christ, we set our minds on things above. That heavenly focus shows up in very earthly ways: getting rid of anger and lies, and clothing ourselves with compassion, kindness, humility, patience, forgiveness and love.",
+             "If my mind were “set above” this week, what would change in how I speak at home or at work?",
+             "Onesimus", "A runaway slave who met Paul and came to faith (Philemon 10–16). Paul sent him back to his master as “a beloved brother,” and Colossians 4:9 calls him “faithful.” A renewed mind gave him a new identity and a restored relationship."],
+
+            // WEEK 2 — Shifting Your Mindset
+            ["Grasshoppers or Giants?", "Numbers 13–14", "Numbers 13-14",
+             "Twelve spies saw the same land. Ten saw giants and felt like grasshoppers; two saw God’s promise. Their mindset decided a whole generation’s future. How we interpret the facts matters as much as the facts themselves.",
+             "In what situation am I seeing myself as a “grasshopper”? What does God’s promise say about it?",
+             "Joshua & Caleb", "Of the twelve spies, only these two said Israel could take the land because the Lord was with them (Numbers 14:6–9). Caleb had “a different spirit,” and at 85 he was still asking for his mountain (Joshua 14:10–12)."],
+            ["Strong and Courageous", "Joshua 1:1–9", "Joshua 1:1-9",
+             "Moses was dead and Joshua had to lead. God’s command to be strong and courageous came with a reason (“I will be with you”) and a practice (meditate on the Book of the Law day and night). Courage grows through God’s presence and God’s Word.",
+             "Where do I need courage right now, and which promise will I meditate on today?",
+             "Joshua", "Moses’ assistant for decades, Joshua stepped into leadership at a moment of loss. God told him three times to be strong and courageous, and he led Israel across the Jordan into the promised land."],
+            ["Not a Spirit of Fear", "2 Timothy 1:6–7", "2 Timothy 1:6-7",
+             "Paul reminds Timothy to fan into flame the gift of God. Fear is not God’s gift; He gives a spirit of power, love and self-control. Timidity is faced not by forcing confidence, but by remembering what God has placed in us.",
+             "What gift or calling have I let burn low because of fear, and what is one way to fan it into flame?",
+             "Timothy", "A young leader, possibly timid and often unwell (1 Timothy 4:12; 5:23), shaped by the sincere faith of his grandmother Lois and mother Eunice. Paul trusted him with major churches and called him “my true son in the faith.”"],
+            ["Trading Worry for Trust", "Matthew 6:25–34", "Matthew 6:25-34",
+             "Jesus points to birds and lilies as evidence of a Father who provides. Worry adds nothing to life. Seeking first God’s kingdom reorders our priorities and frees us to live one day at a time.",
+             "What am I worrying about that belongs to tomorrow? How can I seek His kingdom first in it today?",
+             "Martha", "Busy serving Jesus, Martha grew “anxious and troubled about many things” (Luke 10:38–42), and Jesus gently pointed her to the one thing needed. Later, at Lazarus’ tomb, she made one of the clearest confessions of faith in the Gospels (John 11:27)."],
+            ["The Secret of Contentment", "Philippians 4:10–13", "Philippians 4:10-13",
+             "Paul learned contentment in plenty and in need. “I can do all things” is not about achieving whatever we want; it is Christ giving strength to stay steady whatever our circumstances.",
+             "Where am I tying my peace to my circumstances? What would contentment look like there?",
+             "Paul", "Once a proud Pharisee, Paul was beaten, shipwrecked, imprisoned and hungry (2 Corinthians 11:23–27). He wrote these words in chains, having learned that Christ was enough in every situation."],
+            ["Joy in the Testing", "James 1:2–8", "James 1:2-8",
+             "James calls us to count trials as joy, not because pain is good, but because tested faith produces steadfastness and maturity. When we lack wisdom we ask God in faith, without a divided, double-minded heart.",
+             "What trial am I in, and what might God be growing in me through it? What wisdom do I need to ask Him for?",
+             "Job", "A righteous man who lost his wealth, children and health. He questioned and lamented honestly, yet would not curse God. James 5:11 points to his steadfastness and to the Lord’s compassion and mercy at the end of his story."],
+            ["Guard Your Heart", "Proverbs 4:20–27", "Proverbs 4:20-27",
+             "Everything we do flows from the heart. A father urges his son to keep God’s words close, watch his mouth and eyes, and ponder the path of his feet. A mindset becomes a lifestyle through small, guarded choices.",
+             "What am I letting in through my eyes and ears that is shaping my heart? What one boundary would help me guard it?",
+             "Solomon", "The wisest king asked God for an understanding heart (1 Kings 3:9). Yet later his heart was turned away by unguarded loyalties (1 Kings 11:4). His story shows that a good start must be protected to the end."],
+
+            // WEEK 3 — Rediscovering Who You Are
+            ["Made in His Image", "Genesis 1:26–31", "Genesis 1:26-31",
+             "Before you did anything, God made you in His image, blessed you and gave you purpose. He looked at humanity and called it “very good.” Identity starts with who made us, not with what others say about us.",
+             "What does it mean for me today that I bear God’s image? Which label do I need to replace with this truth?",
+             "Adam & Eve", "Created in God’s image and given purpose, they lost sight of that identity when they doubted God’s word (Genesis 3). Even then, God came looking for them and clothed them, a picture of the grace that restores identity."],
+            ["Fearfully and Wonderfully Made", "Psalm 139:1–18", "Psalm 139:1-18",
+             "God knows us completely, is present wherever we go, and formed us intricately in the womb. His thoughts toward us outnumber the sand. We are fully known and still fully loved.",
+             "Which part of me do I struggle to see as “wonderfully made”? Write a prayer thanking God for it.",
+             "David", "The overlooked youngest son, left in the fields when Samuel came to anoint a king (1 Samuel 16:11). God looked at his heart. David’s psalms show a man secure enough in God’s knowledge of him to bring every emotion to Him."],
+            ["Chosen, Adopted, Created for Good Works", "Ephesians 1:3–14 · 2:10", "Ephesians 1:3-14; Ephesians 2:10",
+             "In Christ we are blessed, chosen, adopted, redeemed, forgiven and sealed with the Holy Spirit. We are God’s workmanship, created for good works He prepared beforehand. Identity comes first; purpose flows from it.",
+             "List each “in Him” statement in Ephesians 1. Which one do I most need to believe today?",
+             "Mephibosheth", "Jonathan’s son, lame in both feet and living in Lo-debar, called himself a “dead dog.” King David restored his land and gave him a permanent seat at the king’s table like one of his own sons (2 Samuel 9), a picture of adoption by grace."],
+            ["Mighty Warrior in the Winepress", "Judges 6:11–24", "Judges 6:11-24",
+             "Gideon was hiding, threshing wheat in a winepress, when the angel called him a “mighty man of valour.” God names us by what He sees, not by our fears, and His “Go in this might of yours” comes with “I will be with you.”",
+             "What does God call me that I find hard to accept? What “winepress” am I hiding in?",
+             "Gideon", "From the weakest clan and the least in his family, Gideon asked for signs and started small. God reduced his army to 300 so that the victory would clearly be His (Judges 7)."],
+            ["Who Am I? I AM.", "Exodus 3–4", "Exodus 3-4",
+             "Moses answered God’s call with excuses: Who am I? What if they don’t believe me? I’m not eloquent. God answered each with Himself: “I will be with you… I AM WHO I AM.” Our inadequacy is answered by His sufficiency.",
+             "Which of Moses’ excuses sounds most like mine? How does God’s answer apply to me?",
+             "Moses", "Raised in Pharaoh’s palace, then a shepherd for forty years after a failure, Moses met God at a burning bush. The man who said “I am slow of speech” became the one God spoke with “face to face, as a man speaks to his friend” (Exodus 33:11)."],
+            ["Known Before You Were Formed", "Jeremiah 1:4–10", "Jeremiah 1:4-10",
+             "God knew, set apart and appointed Jeremiah before he was born. When Jeremiah protested that he was only a youth, God touched his mouth and put His words there. Our calling rests on God’s knowledge of us, not on our age or ability.",
+             "Where have I said “I am only…”? What does God say back to me?",
+             "Jeremiah", "Called young to a hard, unpopular message, Jeremiah wept, complained and was imprisoned, yet said God’s word was “like a burning fire shut up in my bones” (Jeremiah 20:9). He stayed faithful for more than forty years."],
+            ["Restored After Failure", "John 21:1–19", "John 21:1-19",
+             "After denying Jesus three times, Peter went back to fishing. Jesus met him with breakfast, asked three times “Do you love me?” and recommissioned him: “Feed my sheep… Follow me.” Failure is not the end of your identity or purpose.",
+             "Is there a failure I think disqualifies me? How is Jesus inviting me to follow Him again?",
+             "Peter", "Impulsive, bold and sometimes wrong, Peter walked on water and sank, confessed Jesus as the Christ and later denied Him. Restored by Jesus, he preached at Pentecost and about 3,000 people believed (Acts 2:41)."],
+
+            // WEEK 4 — Building Relationships
+            ["Loyal Love", "Ruth 1–2", "Ruth 1-2",
+             "Ruth chose to stay with grieving Naomi: “Where you go I will go.” Her faithful, practical love and Boaz’s generous kindness show how God works through committed relationships to bring redemption.",
+             "Who has God placed in my life who needs my loyal, practical love this week?",
+             "Ruth & Naomi", "A Moabite widow and her bitter, grieving mother-in-law. Ruth’s commitment carried them both, Boaz welcomed her, and Ruth became the great-grandmother of King David (Ruth 4:17)."],
+            ["A Covenant Friendship", "1 Samuel 18:1–4 · 20", "1 Samuel 18:1-4; 1 Samuel 20",
+             "Jonathan, heir to the throne, loved David as himself and gave him his robe and weapons. He protected David even at cost to himself. Healthy friendship is loyal, honest and not threatened by another person’s calling.",
+             "Am I the kind of friend Jonathan was? Who are my covenant friends, and how can I invest in them?",
+             "Jonathan & David", "Jonathan could have seen David as a rival. Instead he made a covenant with him, warned him of Saul’s plans and strengthened his hand in God (1 Samuel 23:16). David later honoured that covenant by caring for Jonathan’s son."],
+            ["The More Excellent Way", "1 Corinthians 13", "1 Corinthians 13",
+             "Gifts, knowledge and sacrifice mean nothing without love. Paul describes love in action: patient, kind, not envious or proud, keeping no record of wrongs, and always protecting, trusting, hoping and persevering.",
+             "Read verses 4–7 with my own name in place of “love.” Which line is hardest to say honestly?",
+             "Priscilla & Aquila", "A tentmaking couple who opened their home to Paul and to a church, gently explained the way of God more accurately to Apollos (Acts 18:26), and “risked their necks” for Paul (Romans 16:3–4). Their love was practical, hospitable and brave."],
+            ["Reconciliation and Forgiveness", "Matthew 18:15–35", "Matthew 18:15-35",
+             "Jesus gives a clear path for addressing hurt: go privately first, then involve others if needed. Through the parable of the unforgiving servant He shows that those who have been forgiven so much must forgive from the heart.",
+             "Is there someone I need to talk to privately, or forgive from the heart? What step will I take?",
+             "Joseph", "Betrayed and sold by his brothers, falsely accused and forgotten in prison. When he finally had power over them, he wept and said, “You meant evil against me, but God meant it for good” (Genesis 50:20), and he provided for their families."],
+            ["Overcome Evil with Good", "Romans 12:9–21", "Romans 12:9-21",
+             "Love must be sincere: honour one another, share with those in need, bless those who persecute you, live in harmony and, as far as it depends on you, live at peace with everyone. Leave vengeance to God and overcome evil with good.",
+             "Who is hard for me to bless right now? What practical good can I do for them?",
+             "Abigail", "Married to a harsh, foolish man, Abigail acted quickly when David set out for revenge. Her humble, wise words and generous gift stopped bloodshed, and David blessed God for her discernment (1 Samuel 25:32–33)."],
+            ["Iron Sharpens Iron", "Proverbs 27:5–17 · Ecclesiastes 4:9–12", "Proverbs 27:5-17; Ecclesiastes 4:9-12",
+             "Faithful are the wounds of a friend. Honest, loving correction sharpens us, and two are better than one: they lift each other up, and a threefold cord is not quickly broken.",
+             "Who in my life is allowed to speak honestly to me? Am I willing to be that friend for someone else?",
+             "Nathan & David", "After David’s sin with Bathsheba, the prophet Nathan told a story that made David see himself: “You are the man!” (2 Samuel 12:7). That faithful wound led to David’s repentance and to Psalm 51."],
+            ["Stir One Another Up", "Hebrews 10:24–25", "Hebrews 10:24-25",
+             "The study ends where growth continues: in community. We are to think about how to stir one another up to love and good works, keep meeting together and keep encouraging each other. A renewed mind and true identity flourish among God’s people.",
+             "What community will I commit to after these 28 days, and whom will I encourage this week?",
+             "Barnabas", "His name means “son of encouragement” (Acts 4:36). He sold land to give to those in need, vouched for the newly converted Saul when others were afraid (Acts 9:27), and gave John Mark a second chance."]
+        ];
+
+        const studyData = RAW.map((r, i) => {
+            const day = i + 1;
+            return {
+                day,
+                week: Math.ceil(day / 7),
+                title: r[0], scripture: r[1], query: r[2],
+                focus: r[3], reflection: r[4],
+                character: { name: r[5], desc: r[6] },
+                // Battlefield: Ch 1–25 on Days 1–25, catch-up Days 26–28
+                bom: day <= 25 ? day : 'catch',
+                // Power of the Mind: Ch 1–13 on even Days 2–26, catch-up Days 27–28
+                pom: day >= 27 ? 'catch' : (day % 2 === 0 ? day / 2 : null)
+            };
+        });
+
+        // ---------- STATE ----------
+        const STORE_KEY = 'renew28-progress-v1';
+        let state = {};
+        try { state = JSON.parse(localStorage.getItem(STORE_KEY)) || {}; } catch (e) { state = {}; }
+        function dayState(n) { return state[n] || (state[n] = {}); }
+        function persist() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+
+        let currentWeek = 'all';
+        let currentView = 'cards';
+        let openDay = null;
+        try { currentView = localStorage.getItem('renew28-view') || 'cards'; } catch (e) {}
+
+        function bibleRead(n) { const s = dayState(n); return VERSIONS.every(v => s[v]); }
+        function tasksFor(d) {
+            const t = [...VERSIONS];
+            if (typeof d.bom === 'number') t.push('bom');
+            if (typeof d.pom === 'number') t.push('pom');
+            return t;
+        }
+        function bibleUrl(query, version) {
+            return 'https://www.biblegateway.com/passage/?search=' + encodeURIComponent(query) + '&version=' + (version || 'ESV;NIV;TPT');
+        }
+
+        // ---------- RENDER HELPERS ----------
+        function cb(day, key, label, extra = '') {
+            const checked = dayState(day)[key] ? 'checked' : '';
+            return `<label class="inline-flex items-center gap-1.5 cursor-pointer select-none ${extra}">
+                <input type="checkbox" data-day="${day}" data-key="${key}" ${checked} class="w-4 h-4 cursor-pointer">
+                <span>${label}</span></label>`;
+        }
+        function bookCell(d, key) {
+            const v = d[key];
+            if (typeof v === 'number') return cb(d.day, key, 'Ch ' + v);
+            if (v === 'catch') return '<span class="text-slate-400 dark:text-slate-500 italic text-xs">Catch-up</span>';
+            return '<span class="text-slate-300 dark:text-slate-600">—</span>';
+        }
+
+        function renderTabs() {
+            const tabs = [['all', 'All Weeks (28 Days)'], ...Object.entries(WEEKS).map(([n, t]) => [n, `Week ${n}: ${t}`])];
+            document.getElementById('week-tabs').innerHTML = tabs.map(([k, label]) => {
+                const active = String(currentWeek) === String(k);
+                return `<button onclick="filterWeek('${k}')" class="whitespace-nowrap px-3 sm:px-4 py-2 text-xs rounded-t-lg transition border-b-2 ${active
+                    ? 'font-semibold border-amber-500 text-amber-600 dark:text-amber-400 bg-slate-200/50 dark:bg-slate-800/50'
+                    : 'font-medium border-transparent text-slate-500 hover:text-slate-800 dark:hover:text-slate-200'}">${label}</button>`;
+            }).join('');
+        }
+
+        function renderCards() {
+            const weeks = currentWeek === 'all' ? [1, 2, 3, 4] : [Number(currentWeek)];
+            document.getElementById('cards-view').innerHTML = weeks.map(w => {
+                const days = studyData.filter(d => d.week === w);
+                const doneCount = days.filter(d => dayState(d.day).done).length;
+                return `<section class="space-y-4">
+                    <div class="p-4 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-3">
+                        <div>
+                            <span class="text-xs font-bold text-amber-600 dark:text-amber-400 uppercase tracking-widest">Week ${w} • Days ${(w - 1) * 7 + 1}–${w * 7}</span>
+                            <h3 class="font-serif font-bold text-base text-slate-900 dark:text-slate-100">${WEEKS[w]}</h3>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 whitespace-nowrap">${doneCount} / 7 done</span>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        ${days.map(cardHtml).join('')}
+                    </div>
+                </section>`;
+            }).join('');
+        }
+
+        function cardHtml(d) {
+            const s = dayState(d.day);
+            const done = !!s.done;
+            const pomLabel = typeof d.pom === 'number' ? 'Ch ' + d.pom : (d.pom === 'catch' ? 'Catch-up' : '');
+            return `<article data-open="${d.day}" tabindex="0" class="group cursor-pointer rounded-2xl border ${done ? 'border-amber-500/50 bg-amber-50/60 dark:bg-amber-500/5' : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900'} p-4 hover:border-amber-500 hover:shadow-lg transition flex flex-col gap-3 focus:outline-none focus:ring-2 focus:ring-amber-500/50">
+                <div class="flex items-center justify-between">
+                    <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">Day ${d.day}</span>
+                    ${done ? '<i class="fa-solid fa-circle-check text-amber-500" title="Completed"></i>' : '<i class="fa-regular fa-circle text-slate-300 dark:text-slate-600"></i>'}
+                </div>
+                <div class="space-y-1">
+                    <h4 class="font-serif font-bold text-sm text-slate-900 dark:text-slate-100 leading-snug group-hover:text-amber-600 dark:group-hover:text-amber-400 transition">${d.title}</h4>
+                    <p class="text-xs font-semibold text-amber-700 dark:text-amber-400"><i class="fa-solid fa-book-bible mr-1"></i>${d.scripture}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400"><i class="fa-solid fa-user mr-1"></i>${d.character.name}</p>
+                </div>
+                <div class="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2 text-xs text-slate-700 dark:text-slate-300">
+                    <div class="flex flex-wrap gap-x-3 gap-y-1">${VERSIONS.map(v => cb(d.day, v, v)).join('')}</div>
+                    <div class="flex flex-wrap gap-x-3 gap-y-1 text-slate-600 dark:text-slate-400">
+                        <span class="inline-flex items-center gap-1.5"><span class="font-semibold">Battlefield:</span> ${bookCell(d, 'bom')}</span>
+                        ${pomLabel ? `<span class="inline-flex items-center gap-1.5"><span class="font-semibold">Power:</span> ${bookCell(d, 'pom')}</span>` : ''}
+                    </div>
+                </div>
+            </article>`;
+        }
+
+        function renderTracker() {
+            const weeks = currentWeek === 'all' ? [1, 2, 3, 4] : [Number(currentWeek)];
+            let html = '';
+            weeks.forEach(w => {
+                html += `<tr><td colspan="6" class="px-4 pt-5 pb-2 text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400 border-b border-slate-200 dark:border-slate-800">Week ${w} · ${WEEKS[w]}</td></tr>`;
+                studyData.filter(d => d.week === w).forEach(d => {
+                    html += `<tr class="border-b border-slate-100 dark:border-slate-800/70 hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                        <td class="px-4 py-2.5 text-slate-500">${d.day}</td>
+                        <td class="px-4 py-2.5"><button data-open="${d.day}" class="text-left text-slate-800 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-400 hover:underline">${d.scripture}</button></td>
+                        <td class="px-4 py-2.5"><div class="flex gap-3 text-xs">${VERSIONS.map(v => cb(d.day, v, v)).join('')}</div></td>
+                        <td class="px-4 py-2.5 text-xs">${bookCell(d, 'bom')}</td>
+                        <td class="px-4 py-2.5 text-xs">${bookCell(d, 'pom')}</td>
+                        <td class="px-4 py-2.5 text-center">${cb(d.day, 'done', '<span class="sr-only">Day complete</span>')}</td>
+                    </tr>`;
+                });
+            });
+            document.getElementById('tracker-body').innerHTML = html;
+        }
+
+        function renderStats() {
+            const days = studyData.filter(d => dayState(d.day).done).length;
+            const bible = studyData.filter(d => bibleRead(d.day)).length;
+            const bom = studyData.filter(d => typeof d.bom === 'number' && dayState(d.day).bom).length;
+            const pom = studyData.filter(d => typeof d.pom === 'number' && dayState(d.day).pom).length;
+            const set = (id, n, total) => {
+                document.getElementById('stat-' + id).textContent = `${n} / ${total}`;
+                document.getElementById('bar-' + id).style.width = (n / total * 100) + '%';
+            };
+            set('days', days, 28); set('bible', bible, 28); set('bom', bom, 25); set('pom', pom, 13);
+            const next = studyData.find(d => !dayState(d.day).done);
+            document.getElementById('next-up').innerHTML = next
+                ? `<i class="fa-solid fa-fire mr-1"></i>Next up: Day ${next.day} · ${next.scripture}`
+                : '<i class="fa-solid fa-trophy mr-1"></i>All 28 days completed!';
+        }
+
+        function renderAll() {
+            renderTabs();
+            if (currentView === 'cards') renderCards(); else renderTracker();
+            document.getElementById('cards-view').classList.toggle('hidden', currentView !== 'cards');
+            document.getElementById('tracker-view').classList.toggle('hidden', currentView !== 'tracker');
+            document.querySelectorAll('.view-btn').forEach(b => {
+                const on = b.id === 'view-' + currentView;
+                b.className = 'view-btn px-3 py-1.5 text-xs font-semibold rounded-md transition ' +
+                    (on ? 'bg-amber-500 text-slate-950' : 'text-slate-500 hover:text-slate-800 dark:hover:text-slate-200');
+            });
+            renderStats();
+        }
+
+        // ---------- EVENTS ----------
+        function setTask(day, key, value) {
+            const s = dayState(day);
+            s[key] = value;
+            const d = studyData[day - 1];
+            if (key !== 'done' && value && tasksFor(d).every(k => s[k])) s.done = true;
+            persist();
+            renderAll();
+            if (openDay === day) fillModalChecks();
+        }
+
+        document.addEventListener('change', e => {
+            const t = e.target;
+            if (t.matches('input[type="checkbox"][data-day]')) setTask(Number(t.dataset.day), t.dataset.key, t.checked);
+        });
+        document.addEventListener('click', e => {
+            if (e.target.closest('label, input, a')) return;
+            const el = e.target.closest('[data-open]');
+            if (el) openModal(Number(el.dataset.open));
+        });
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && openDay) closeModal();
+            if ((e.key === 'Enter' || e.key === ' ') && e.target.matches('article[data-open]')) {
+                e.preventDefault(); openModal(Number(e.target.dataset.open));
+            }
+        });
+
+        function filterWeek(w) { currentWeek = w; renderAll(); }
+        function setView(v) {
+            currentView = v;
+            try { localStorage.setItem('renew28-view', v); } catch (e) {}
+            renderAll();
+        }
+
+        // ---------- MODAL ----------
+        function fillModalChecks() {
+            const d = studyData[openDay - 1];
+            document.getElementById('modal-translations').innerHTML = VERSIONS.map(v => `
+                <div class="flex items-center justify-between gap-2 px-3 py-2 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm">
+                    ${cb(d.day, v, '<span class="font-semibold">' + v + '</span>')}
+                    <a href="${bibleUrl(d.query, v)}" target="_blank" rel="noopener" class="text-xs text-amber-600 dark:text-amber-400 hover:underline">Read <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
+                </div>`).join('');
+            const book = (key) => {
+                const v = d[key];
+                const title = BOOKS[key].title;
+                const body = typeof v === 'number' ? cb(d.day, key, `Chapter ${v} <span class="text-slate-400">of ${BOOKS[key].total}</span>`)
+                    : v === 'catch' ? '<span class="italic text-slate-500 dark:text-slate-400">Catch-up day: finish any unread chapters</span>'
+                    : '<span class="text-slate-400 dark:text-slate-500">No chapter today</span>';
+                return `<div class="px-3 py-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/40 text-sm space-y-1">
+                    <div class="text-xs font-semibold text-slate-500 dark:text-slate-400"><em>${title}</em></div>
+                    <div class="text-slate-800 dark:text-slate-200">${body}</div></div>`;
+            };
+            document.getElementById('modal-books').innerHTML = book('bom') + book('pom');
+            document.getElementById('modal-done').checked = !!dayState(d.day).done;
+        }
+
+        function openModal(n) {
+            const d = studyData[n - 1];
+            openDay = n;
+            document.getElementById('modal-day-badge').textContent = 'Day ' + d.day;
+            document.getElementById('modal-week-badge').textContent = `Week ${d.week} · ${WEEKS[d.week]}`;
+            document.getElementById('modal-title').textContent = d.title;
+            document.getElementById('modal-scripture').textContent = d.scripture;
+            document.getElementById('modal-parallel').href = bibleUrl(d.query);
+            document.getElementById('modal-focus').textContent = d.focus;
+            document.getElementById('modal-character-name').textContent = d.character.name;
+            document.getElementById('modal-character-desc').textContent = d.character.desc;
+            document.getElementById('modal-reflection').textContent = d.reflection;
+            document.getElementById('modal-journal-input').value = dayState(n).note || '';
+            document.getElementById('journal-saved-status').classList.add('hidden');
+            fillModalChecks();
+            const bd = document.getElementById('modal-backdrop');
+            bd.classList.remove('hidden'); bd.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeModal() {
+            saveJournalNote(true);
+            openDay = null;
+            const bd = document.getElementById('modal-backdrop');
+            bd.classList.add('hidden'); bd.classList.remove('flex');
+            document.body.style.overflow = '';
+        }
+        function stepDay(delta) {
+            const n = openDay + delta;
+            if (n < 1 || n > 28) return;
+            saveJournalNote(true);
+            openModal(n);
+        }
+        function saveJournalNote(silent) {
+            if (!openDay) return;
+            const val = document.getElementById('modal-journal-input').value;
+            if ((dayState(openDay).note || '') === val) { if (!silent) flashSaved(); return; }
+            dayState(openDay).note = val;
+            persist();
+            if (!silent) flashSaved();
+        }
+        function flashSaved() {
+            const el = document.getElementById('journal-saved-status');
+            el.classList.remove('hidden');
+            clearTimeout(flashSaved.t);
+            flashSaved.t = setTimeout(() => el.classList.add('hidden'), 1800);
+        }
+        document.getElementById('modal-done').addEventListener('change', e => setTask(openDay, 'done', e.target.checked));
+        let journalTimer;
+        document.getElementById('modal-journal-input').addEventListener('input', () => {
+            clearTimeout(journalTimer);
+            journalTimer = setTimeout(() => saveJournalNote(false), 800);
+        });
+
+        // ---------- THEME / RESET ----------
+        function syncThemeIcon() {
+            document.getElementById('theme-icon').className = document.documentElement.classList.contains('dark') ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+        }
+        function toggleTheme() {
+            const dark = document.documentElement.classList.toggle('dark');
+            try { localStorage.setItem('renew28-theme', dark ? 'dark' : 'light'); } catch (e) {}
+            syncThemeIcon();
+        }
+        function resetProgress() {
+            if (!confirm('Reset all progress, checkboxes and journal notes? This cannot be undone.')) return;
+            state = {};
+            persist();
+            renderAll();
+        }
+
+        syncThemeIcon();
+        renderAll();
+    </script>
+</body>
+</html>
