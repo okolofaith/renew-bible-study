@@ -4,7 +4,7 @@
 
 A free, interactive 28-day Bible study that helps you break negative thought patterns, ground your worth in God's design, and build life-giving relationships. Read each day's passage in three translations (ESV, NIV and TPT), alongside two companion books, and track your progress as you go.
 
-🔗 **Live site:** https://okolofaith.github.io/renew-bible-study/
+🔗 **Live site:** [https://okolofaith.github.io/renew-bible-study]
 
 ---
 
